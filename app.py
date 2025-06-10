@@ -71,7 +71,7 @@ def notify_aachen_termin(bot: telegram.Bot):
             text = text.replace(".", "\.")
             bot.send_message(chat_id=CHANNEL_ID, text=text, parse_mode='MarkdownV2')
     
-    for team in ['Team 1', 'Team 2', 'Team 3']:
+    for team in ['Team 1']:
         is_available, res = aachen_hbf_termin(team)
         if is_available:
             text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"

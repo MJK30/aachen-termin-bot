@@ -352,12 +352,53 @@ def aachen_hbf_termin(team_name):
             return False, f"Cannot find sugg_accordion! Possible new appointments are available now at HBF {team_name}"
     else:
         logging.info(f'No appointment is available at HBF {team_name}.')                
-        return False, f'No appointment is available at HBF {team_name}.'   
+        return False, f'No appointment is available at HBF {team_name}.' 
+    
+def aufenthalt_az_termin():
+    headers = {"User-Agent": USER_AGENT_STRING}
+    session = requests.Session()
+    session.headers.update(headers)
 
+    url_1 = 'https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1'
+    url_3 = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
 
-# superc_termin(1)
-# aachen_hbf_termin('Team 1')
-# aachen_hbf_termin('Team 2')
-# aachen_hbf_termin('Team 3')
-# for key, value in hbf_url.items():
-#     aachen_hbf_termin(key, value)
+    res_1 = session.get(url_1)
+    soup = bs4.BeautifulSoup(res_1.content, 'html.parser')
+
+    success, url_2 = format_url_2(soup, "Aufenthalt", 0)
+    if not success:
+        return False, url_2
+
+    res_2 = session.get(url_2)
+    soup2 = bs4.BeautifulSoup(res_2.content, 'html.parser')
+    loc = soup2.find('input', {'name': 'loc'}).get('value')
+    logging.info(f'Aufenthalt A-Z loc: {loc}')
+
+    payload = {
+        'loc': str(loc),
+        'gps_lat': '55.77858',
+        'gps_long': '65.07867',
+        'select_location': 'Ausländeramt Aachen, 2. Etage auswählen'
+    }
+    session.post(url_2, data=payload)
+
+    res_4 = session.get(url_3)
+
+    if "Kein freier Termin verfügbar" not in res_4.text:
+        soup4 = bs4.BeautifulSoup(res_4.text, 'html.parser')
+        div = soup4.find("div", {"id": "sugg_accordion"})
+        summary_tag = soup4.find('summary', id='suggest_details_summary')
+
+        if div:
+            h3 = div.find_all("h3")
+            res = 'New appointments available for Aufenthalt A-Z:\n'
+            for h in h3:
+                res += h.text + '\n'
+            return True, res[:-1]
+        elif summary_tag:
+            summary_text = summary_tag.get_text(strip=True)
+            return True, 'New appointments available for Aufenthalt A-Z:\n' + summary_text
+        else:
+            return False, "Cannot find sugg_accordion! Possible slots available."
+    else:
+        return False, "No appointments available for Aufenthalt A-Z"

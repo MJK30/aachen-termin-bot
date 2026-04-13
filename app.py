@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 from flask import Flask
 from flask_apscheduler import APScheduler
-from termin import superc_termin, aachen_hbf_termin, abholung_termin, fh_termin
+from termin import superc_termin, aachen_hbf_termin, abholung_termin, fh_termin, aufenthalt_az_termin
 from an import notify_aachen_anmeldung
 
 class Config:
@@ -28,6 +28,7 @@ URL: Final = 'https://aachen-termin-bot.onrender.com'
 
 ABHOLUNG_CHANNEL_ID: Final = '-1002267097890'
 FH_AACHEN_CHANNEL_ID: Final = '-1002483658914'
+AUFENTHALT_AZ_CHANNEL_ID: Final = '8033847844'
 
 APPOINTMENT_LINK = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
 
@@ -84,6 +85,12 @@ def notify_aachen_termin(bot: telegram.Bot):
         text = f"{res}\n[🔥 Check now]({APPOINTMENT_LINK})"
         text = text.replace(".", "\.")
         bot.send_message(chat_id=FH_AACHEN_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
+        
+    is_available, res = aufenthalt_az_termin()
+    if is_available:
+        text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
+        text = text.replace(".", "\.")
+        bot.send_message(chat_id=AUFENTHALT_AZ_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
 
 #  The site for Aachen Anmeldung is changed and the old method is not working
 # def notify_aachen_anmeldung(bot: telegram.Bot):

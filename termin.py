@@ -401,4 +401,5 @@ def aufenthalt_az_termin():
         else:
             return False, "Cannot find sugg_accordion! Possible slots available."
     else:
+        logging.info("No appointments available for Aufenthalt A-Z")
         return False, "No appointments available for Aufenthalt A-Z"

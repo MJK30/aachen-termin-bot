@@ -1,6 +1,7 @@
 from typing import Final
 import requests
 import telegram
+import logging
 from dotenv import load_dotenv
 import os
 from flask import Flask
@@ -61,36 +62,43 @@ def notify_abholung(bot: telegram.Bot):
         bot.send_message(chat_id=ABHOLUNG_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
 
 def notify_aachen_termin(bot: telegram.Bot):
-
-    # TODO ONE COULD POSSIBLY NOTIFY ABOUT OTHER APPOINTMENT TYPES
-    # HOWEVER I AM NOT SURE IF THE SLOTS ARE SHARED BETWEEN TYPES
-    # THIS SYSTEM HECKING SUCKS
     for pos in [0,1,2]:
-        is_available, res = superc_termin(pos)
-        if is_available:            
-            text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
-            text = text.replace(".", "\.")
-            bot.send_message(chat_id=CHANNEL_ID, text=text, parse_mode='MarkdownV2')
-    
+        try:
+            is_available, res = superc_termin(pos)
+            if is_available:
+                text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
+                text = text.replace(".", "\.")
+                bot.send_message(chat_id=CHANNEL_ID, text=text, parse_mode='MarkdownV2')
+        except Exception as e:
+            logging.error(f"SuperC notification failed: {e}")
+
     for team in ['Team 1']:
-        is_available, res = aachen_hbf_termin(team)
+        try:
+            is_available, res = aachen_hbf_termin(team)
+            if is_available:
+                text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
+                text = text.replace(".", "\.")
+                bot.send_message(chat_id=HBF_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
+        except Exception as e:
+            logging.error(f"HBF notification failed: {e}")
+
+    try:
+        is_available, res = fh_termin()
+        if is_available:
+            text = f"{res}\n[🔥 Check now]({APPOINTMENT_LINK})"
+            text = text.replace(".", "\.")
+            bot.send_message(chat_id=FH_AACHEN_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
+    except Exception as e:
+        logging.error(f"FH notification failed: {e}")
+
+    try:
+        is_available, res = aufenthalt_az_termin()
         if is_available:
             text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
             text = text.replace(".", "\.")
-            bot.send_message(chat_id=HBF_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
-    
-    
-    is_available, res = fh_termin()
-    if is_available:
-        text = f"{res}\n[🔥 Check now]({APPOINTMENT_LINK})"
-        text = text.replace(".", "\.")
-        bot.send_message(chat_id=FH_AACHEN_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
-        
-    is_available, res = aufenthalt_az_termin()
-    if is_available:
-        text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
-        text = text.replace(".", "\.")
-        bot.send_message(chat_id=AUFENTHALT_AZ_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
+            bot.send_message(chat_id=AUFENTHALT_AZ_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
+    except Exception as e:
+        logging.error(f"Aufenthalt A-Z notification failed: {e}")
 
 #  The site for Aachen Anmeldung is changed and the old method is not working
 # def notify_aachen_anmeldung(bot: telegram.Bot):

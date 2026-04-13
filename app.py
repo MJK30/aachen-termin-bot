@@ -55,11 +55,14 @@ def job1():
     # notify_aachen_anmeldung(bot)
 
 def notify_abholung(bot: telegram.Bot):
-    is_available, res = abholung_termin()
-    if is_available:
-        text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
-        text = text.replace(".", "\.")
-        bot.send_message(chat_id=ABHOLUNG_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
+    try:
+        is_available, res = abholung_termin()
+        if is_available:
+            text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
+            text = text.replace(".", "\.")
+            bot.send_message(chat_id=ABHOLUNG_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
+    except Exception as e:
+        logging.error(f"Abholung notification failed: {e}")
 
 def notify_aachen_termin(bot: telegram.Bot):
     for pos in [0,1,2]:

@@ -111,3 +111,7 @@ def notify_aachen_termin(bot: telegram.Bot):
 def job2():
     r = requests.get(f'{URL}/status')
     print(r)
+    
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

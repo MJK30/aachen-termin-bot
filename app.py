@@ -98,7 +98,7 @@ def notify_aachen_termin(bot: telegram.Bot):
         is_available, res = aufenthalt_az_termin()
         if is_available:
             text = f"{res}\n[🔥 Book Now\!]({APPOINTMENT_LINK})"
-            text = text.replace(".", "\.")
+            text = text.replace(".", "\.").replace("-", "\-")
             bot.send_message(chat_id=AUFENTHALT_AZ_CHANNEL_ID, text=text, parse_mode='MarkdownV2')
     except Exception as e:
         logging.error(f"Aufenthalt A-Z notification failed: {e}")

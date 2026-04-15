@@ -103,13 +103,13 @@ def abholung_termin():
     url_1 = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
     url_2 = ""
     url_3 = "https://termine.staedteregion-aachen.de/auslaenderamt/suggest"
-    res_1 = session.get(url_1)
+    res_1 = session.get(url_1, timeout=10)
 
     # Get RWTH cnc id
     soup = bs4.BeautifulSoup(res_1.content, "html.parser")
     success, url_2 = format_url_2(soup, "Abholung", 0)
     if success:
-        res_2 = session.get(url_2)
+        res_2 = session.get(url_2, timeout=10)
     else:
         return False, url_2
 
@@ -123,8 +123,8 @@ def abholung_termin():
         "gps_long": "65.07867",
         "select_location": "Ausländeramt Aachen - Aachen Arkaden, Trierer Straße 1, Aachen auswählen",
     }
-    res_3 = session.post(url_2, data=payload)
-    res_4 = session.get(url_3)
+    res_3 = session.post(url_2, data=payload, timeout=10)
+    res_4 = session.get(url_3, timeout=10)
 
     if "Kein freier Termin verfügbar" not in res_4.text:
         # get exact termin date
@@ -208,13 +208,13 @@ def superc_termin(form_pos: int = 0):
     url_1 = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
     url_2 = ""
     url_3 = "https://termine.staedteregion-aachen.de/auslaenderamt/suggest"
-    res_1 = session.get(url_1)
+    res_1 = session.get(url_1, timeout=10)
 
     # Get RWTH cnc id
     soup = bs4.BeautifulSoup(res_1.content, "html.parser")
     success, url_2 = format_url_2(soup, "Super C", form_pos)
     if success:
-        res_2 = session.get(url_2)
+        res_2 = session.get(url_2, timeout=10)
     else:
         return False, url_2
 
@@ -228,8 +228,8 @@ def superc_termin(form_pos: int = 0):
         "gps_long": "65.07867",
         "select_location": "Ausländeramt Aachen - Außenstelle RWTH auswählen",
     }
-    res_3 = session.post(url_2, data=payload)
-    res_4 = session.get(url_3)
+    res_3 = session.post(url_2, data=payload, timeout=10)
+    res_4 = session.get(url_3, timeout=10)
 
     if "Kein freier Termin verfügbar" not in res_4.text:
         # get exact termin date
@@ -273,7 +273,7 @@ def fh_termin():
     url_1 = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
     url_2 = ""
     url_3 = "https://termine.staedteregion-aachen.de/auslaenderamt/suggest"
-    res_1 = session.get(url_1)
+    res_1 = session.get(url_1, timeout=10)
 
     # Get RWTH cnc id
     soup = bs4.BeautifulSoup(res_1.content, "html.parser")
@@ -292,7 +292,7 @@ def fh_termin():
         logging.info("Element containing 'Fachhochschule Aachen' not found.")
         return False, "Element containing 'Fachhochschule Aachen' not found."
 
-    res_2 = session.get(url_2)
+    res_2 = session.get(url_2, timeout=10)
 
     soup = bs4.BeautifulSoup(res_2.content, "html.parser")
     loc = soup.find("input", {"name": "loc"}).get("value")
@@ -304,8 +304,8 @@ def fh_termin():
         "gps_long": "65.07867",
         "select_location": "Ausländeramt Aachen, 2. Etage auswählen",
     }
-    res_3 = session.post(url_2, data=payload)
-    res_4 = session.get(url_3)
+    res_3 = session.post(url_2, data=payload, timeout=10)
+    res_4 = session.get(url_3, timeout=10)
 
     if "Kein freier Termin verfügbar" not in res_4.text:
         # get exact termin date
@@ -374,11 +374,11 @@ def aachen_hbf_termin(team_name):
     url_1 = "https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1"
     url_2 = ""
     url_3 = "https://termine.staedteregion-aachen.de/auslaenderamt/suggest"
-    res_1 = session.get(url_1)
+    res_1 = session.get(url_1, timeout=10)
 
     url_2 = get_hbf_url(res_1, team_name)
 
-    res_2 = session.get(url_2)
+    res_2 = session.get(url_2, timeout=10)
     soup = bs4.BeautifulSoup(res_2.content, "html.parser")
     loc = soup.find("input", {"name": "loc"}).get("value")
     logging.info(f"Aufenthalt {team_name} loc: {loc}")
@@ -389,8 +389,8 @@ def aachen_hbf_termin(team_name):
         "gps_long": "65.07867",
         "select_location": "Ausländeramt Aachen, 2. Etage auswählen",
     }
-    res_3 = session.post(url_2, data=payload)
-    res_4 = session.get(url_3)
+    res_3 = session.post(url_2, data=payload, timeout=10)
+    res_4 = session.get(url_3, timeout=10)
 
     if "Kein freier Termin verfügbar" not in res_4.text:
         # get exact termin date
